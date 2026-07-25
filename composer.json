@@ -1,0 +1,15 @@
+{
+    "name": "alfacode-team/hkm-plugin-crypto",
+    "description": "HKM Kernel plugin providing 'crypto.services'.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["hkm-kernel", "plugin", "php", "crypto.services"],
+    "require": {
+        "php": ">=8.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Plugins\\Crypto\\": ""
+        }
+    }
+}
