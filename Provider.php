@@ -7,6 +7,7 @@ namespace Plugins\Crypto;
 use AlfacodeTeam\PhpServicePlatform\Kernel\Contracts\ModuleContract;
 use AlfacodeTeam\PhpServicePlatform\Kernel\Container\ModuleContainer;
 use AlfacodeTeam\PhpServicePlatform\Kernel\Events\EventBus;
+use AlfacodeTeam\PhpServicePlatform\Kernel\Exceptions\KernelException;
 use AlfacodeTeam\PhpServicePlatform\Kernel\Pipelines\Cli\CliPipeline;
 use AlfacodeTeam\PhpServicePlatform\Kernel\Pipelines\Http\HttpPipeline;
 use AlfacodeTeam\PhpServicePlatform\Kernel\Pipelines\Worker\WorkerPipeline;
@@ -57,7 +58,22 @@ final class Provider implements ModuleContract
                     env('APP_KEY') ?: '',
                     env('APP_KEY_PREVIOUS') ?: '',
                 ], static fn(string $k) => $k !== ''));
-                return new AesEncrypter($keys === [] ? str_repeat('0', 32) : $keys);
+
+                // FAIL CLOSED. This used to fall back to str_repeat('0', 32) —
+                // a hard-coded, publicly-known key — so a deployment that simply
+                // forgot APP_KEY booted happily while every encrypted cookie and
+                // session became forgeable by anyone who read this source. An
+                // unbootable app is vastly better than a silently insecure one.
+                if ($keys === []) {
+                    throw new KernelException(
+                        'APP_KEY is not set. Refusing to boot the encrypter with a default key: '
+                        . 'every value it produced would be forgeable. Generate one with '
+                        . '`php bin/hkm key:generate` (or set APP_KEY to 32 random bytes, base64-encoded).',
+                        layer: 'crypto.encrypter',
+                    );
+                }
+
+                return new AesEncrypter($keys);
             });
         }
     }

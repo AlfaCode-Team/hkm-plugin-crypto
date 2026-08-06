@@ -92,7 +92,16 @@ final class AesEncrypter implements EncryptionPort
         foreach ($order as $kid) {
             $plain = openssl_decrypt($cipher, self::CIPHER, $this->keys[$kid], OPENSSL_RAW_DATA, $iv, $tag);
             if ($plain !== false) {
-                return $unserialize ? unserialize($plain) : $plain;
+                // allowed_classes: false — decrypt() is reached with attacker-
+                // supplied ciphertext (cookies, sessions). Without this, anyone
+                // who ever obtains the key can hand back a payload that
+                // instantiates arbitrary classes and fires their __wakeup /
+                // __destruct: a PHP object-injection chain. Scalars and arrays
+                // round-trip unchanged; a serialized OBJECT now comes back as
+                // __PHP_Incomplete_Class rather than executing.
+                return $unserialize
+                    ? unserialize($plain, ['allowed_classes' => false])
+                    : $plain;
             }
         }
 
