@@ -17,6 +17,7 @@
     "config": [
         { "key": "APP_KEY",          "type": "string", "required": false },
         { "key": "APP_KEY_PREVIOUS", "type": "string", "required": false },
-        { "key": "HASH_BCRYPT_COST", "type": "int",    "required": false }
+        { "key": "HASH_BCRYPT_COST", "type": "int",    "required": false },
+        { "key": "HASH_PEPPER",      "type": "string", "required": false }
     ]
 }
