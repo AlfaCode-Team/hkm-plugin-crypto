@@ -50,6 +50,11 @@ final class Provider implements ModuleContract
         if (!$container->has(HashingPort::class)) {
             $container->bind(HashingPort::class, static fn() => new PasswordHasher(
                 cost: (int) (env('HASH_BCRYPT_COST') ?: 12),
+                // Optional. Mixed into the pre-hash of passwords too long for
+                // bcrypt, so a stolen user table alone is not enough to attack
+                // them offline. Changing it invalidates those hashes — set it
+                // once, at deployment, alongside APP_KEY.
+                pepper: (string) (env('HASH_PEPPER') ?: ''),
             ));
         }
         if (!$container->has(EncryptionPort::class)) {
