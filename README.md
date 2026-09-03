@@ -20,7 +20,7 @@ Provides `crypto.services`.
 
 ## Documentation
 
-See the [HKM Kernel guides](https://github.com/AlfaCode-Team/hkm-kernel/tree/main/docs/guides).
+- [Kernel guides](https://github.com/AlfaCode-Team/hkm-kernel/tree/main/docs/guides) — the framework contracts this plugin builds on.
 
 ## License
 
